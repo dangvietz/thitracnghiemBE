@@ -1,5 +1,6 @@
 package com.quiz.app.answer;
 
+import com.quiz.app.Message;
 import com.quiz.app.exception.ConstrainstViolationException;
 import com.quiz.app.exception.NotFoundException;
 import com.quiz.entity.Answer;
@@ -45,9 +46,9 @@ public class AnswerService {
     public String deleteById(Integer id) throws ConstrainstViolationException {
         try {
             answerRepository.deleteById(id);
-            return "Xóa lựa chọn thành công";
+            return Message.ANSWER_DELETE_SUCCESSFULLY;
         } catch (Exception ex) {
-            throw new ConstrainstViolationException("Không thể xóa môn học vì ràng buộc dữ liệu");
+            throw new ConstrainstViolationException(Message.ANSWER_DELETE_CONSTRAINT);
         }
     }
 
@@ -57,7 +58,7 @@ public class AnswerService {
             return answer.get();
         }
 
-        throw new NotFoundException("Không tìm thấy môn học với mã " + id);
+        throw new NotFoundException(Message.SUBJECT_ID_NOTFOUND + id);
     }
 
     public List<Answer> findAll() {

@@ -1,5 +1,6 @@
 package com.quiz.app.creditClass;
 
+import com.quiz.app.Message;
 import com.quiz.app.creditClass.dto.CreditClassesDTO;
 import com.quiz.app.creditClass.dto.PostCreateCreditClassDTO;
 import com.quiz.app.exam.ExamService;
@@ -201,23 +202,23 @@ public class CreditClassRestController {
                                                String teacherId
     ) {
         if (Objects.isNull(schoolYear) || StringUtils.isEmpty(schoolYear)) {
-            commonUtils.addError("schoolYear", "Niên khóa không được để trống");
+            commonUtils.addError("schoolYear", Message.ERROR_SCHOOLYEAR_NULL);
         }
 
         if (Objects.isNull(semester)) {
-            commonUtils.addError("semester", "Học kỳ không được để trống");
+            commonUtils.addError("semester", Message.ERROR_SEMESTER_NULL);
         }
 
         if (Objects.isNull(subjectId) || StringUtils.isEmpty(subjectId)) {
-            commonUtils.addError("subjectId", "Môn học không được để trống");
+            commonUtils.addError("subjectId", Message.ERROR_SUBJECT_ID_NULL);
         }
 
         if (Objects.isNull(group)) {
-            commonUtils.addError("group", "Nhóm không được để trống");
+            commonUtils.addError("group", Message.ERROR_SUBJECT_GROUP_NULL);
         }
 
         if (Objects.isNull(teacherId) || StringUtils.isEmpty(teacherId)) {
-            commonUtils.addError("teacherId", "Giảng viên không được để trống");
+            commonUtils.addError("teacherId", Message.ERROR_TEACHER_NULL);
         }
     }
 
@@ -245,8 +246,7 @@ public class CreditClassRestController {
             return new BadResponse<String>(commonUtils.getArrayNode().toString()).response();
         } else {
             if (creditClassService.isUniqueKey(id, schoolYear, semester, subjectId, group, isEdit)) {
-                commonUtils.addError("uniqueKey", "Niên khóa + học kỳ + môn học + nhóm phải là " +
-                        "duy nhất");
+                commonUtils.addError("uniqueKey", Message.ERROR_UNIQUE_KEY);
             }
 
             try {
@@ -284,7 +284,7 @@ public class CreditClassRestController {
                     subject, teacher));
         }
 
-        return new OkResponse<>("Thêm lớp tín chỉ thành công").response();
+        return new OkResponse<>(Message.CREDIT_CLASS_ADD_SUCCESSFULLY).response();
     }
 
     @DeleteMapping("{id}/delete")

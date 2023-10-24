@@ -1,5 +1,6 @@
 package com.quiz.app.subject;
 
+import com.quiz.app.Message;
 import com.quiz.app.chapter.ChapterService;
 import com.quiz.app.chapter.dto.ChapterDTO;
 import com.quiz.app.exception.ConstrainstViolationException;
@@ -104,20 +105,19 @@ public class SubjectRestController {
                                            Integer numberOfTheoreticalPeriods,
                                            Integer numberOfPracticePeriods, boolean isEdit) {
         if (Objects.isNull(id) || StringUtils.isEmpty(name)) {
-            commonUtils.addError("id", "Mã môn học không được để trống");
+            commonUtils.addError("id", Message.ERROR_SUBJECTID_MISMATCH);
         }
 
         if (Objects.isNull(name) || StringUtils.isEmpty(name)) {
-            commonUtils.addError("name", "Tên môn học không được để trống");
+            commonUtils.addError("name", Message.ERROR_SUBJECTNAME_MISMATCH);
         }
 
         if (Objects.isNull(numberOfTheoreticalPeriods)) {
-            commonUtils.addError("numberOfTheoreticalPeriods", "Số tiết lý thuyết không được để trống");
+            commonUtils.addError("numberOfTheoreticalPeriods", Message.ERROR_numberOfTheoreticalPeriods_MISMATCH);
         }
 
         if (Objects.isNull(numberOfPracticePeriods)) {
-            commonUtils.addError("numberOfPracticePeriods", "Số tiết thực hành không được để " +
-                    "trống");
+            commonUtils.addError("numberOfPracticePeriods", Message.ERROR_numberOfPracticePeriods_MISMATCH );
         }
     }
 
@@ -140,13 +140,11 @@ public class SubjectRestController {
             return new BadResponse<String>(commonUtils.getArrayNode().toString()).response();
         } else {
             if (subjectService.isIdDuplicated(id, isEdit)) {
-                commonUtils.addError("id", "Mã môn học đã tồn tại");
+                commonUtils.addError("id", Message.ERROR_SUBJECTID_DUPLICATED);
             }
 
             if ((numberOfTheoreticalPeriods + numberOfPracticePeriods) % 3 != 0) {
-                commonUtils.addError("numberOfPracticePeriods", "Số tiết lý thuyết + thực " +
-                        "hành phải là bội số của 3 "
-                );
+                commonUtils.addError("numberOfPracticePeriods", Message.ERROR_numberOfPeriods_MISMATCH);
             }
 
             if (commonUtils.getArrayNode().size() > 0) {
@@ -222,7 +220,7 @@ public class SubjectRestController {
                     subjectService.save(subject);
                 } catch (Exception e) {
                     if (e.getCause() != null && e.getCause().getCause() instanceof SQLIntegrityConstraintViolationException) {
-                        commonUtils.addError("sqlIntegrationException", "Không thể xóa chương vì ràng buộc dữ liệu");
+                        commonUtils.addError("sqlIntegrationException", Message.ERROR_CHAPTER_CONSTRAINT);
                         return new BadResponse<String>(commonUtils.getArrayNode().toString()).response();
                     }
                 }
@@ -237,7 +235,7 @@ public class SubjectRestController {
             subjectService.save(subject);
         }
 
-        return new OkResponse<>("Thêm môn học thành công").response();
+        return new OkResponse<>(Message.SUBJECT_ADD_SUCCESSFULLY).response();
 
     }
 

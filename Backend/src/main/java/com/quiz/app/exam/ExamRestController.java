@@ -1,5 +1,6 @@
 package com.quiz.app.exam;
 
+import com.quiz.app.Message;
 import com.quiz.app.creditClass.CreditClassService;
 import com.quiz.app.exam.dto.ExamsDTO;
 import com.quiz.app.exam.dto.PostCreateExamDTO;
@@ -118,43 +119,36 @@ public class ExamRestController {
             boolean isEdit) {
         if (isEdit) {
             if (Objects.isNull(id)) {
-                commonUtils.addError("id", "Mã ca thi không được để " +
-                        "trống");
+                commonUtils.addError("id", Message.ERROR_EXAMS_ID_NULL);
             }
         }
 
         if (Objects.isNull(creditClassId)) {
-            commonUtils.addError("creditClassId", "Mã LTC không được để " +
-                    "trống");
+            commonUtils.addError("creditClassId", Message.ERROR_CREDITCLASS_ID_NULL);
         }
 
         if (Objects.isNull(examDate) || StringUtils.isEmpty(examDate)) {
-            commonUtils.addError("examDate", "Số tiết thực hành không được để " +
-                    "trống");
+            commonUtils.addError("examDate", Message.ERROR_EXAMS_DATE_NULL);
         }
 
         if (Objects.isNull(noticePeriod)) {
-            commonUtils.addError("noticePeriod", "Tiết báo danh không được để " +
-                    "trống");
+            commonUtils.addError("noticePeriod", Message.ERROR_NOTICE_PERIOD_NULL);
         }
 
         if (Objects.isNull(numberOfStudents)) {
-            commonUtils.addError("numberOfStudents", "Số SV không được để trống ");
+            commonUtils.addError("numberOfStudents", Message.ERROR_STUDENT_NUM_NULL);
         }
 
         if (Objects.isNull(time)) {
-            commonUtils.addError("time", "Thời gian thi không được để " +
-                    "trống");
+            commonUtils.addError("time", Message.ERROR_EXAMS_TIME_NULL);
         }
 
         if (Objects.isNull(type) || StringUtils.isEmpty(examDate)) {
-            commonUtils.addError("type", "Loại kỳ thi không được để " +
-                    "trống");
+            commonUtils.addError("type", Message.ERROR_EXAMS_TYPE_NULL);
         }
 
         if (tests.size() == 0) {
-            commonUtils.addError("tests", "Đề thi không được để " +
-                    "trống");
+            commonUtils.addError("tests", Message.ERROR_TESTS_NULL);
         }
     }
 
@@ -312,7 +306,7 @@ public class ExamRestController {
             }
         }
 
-        return new OkResponse<>("Thêm ca thi thành công").response();
+        return new OkResponse<>(Message.CATHI_ADD_SUCCESSFULLY).response();
     }
 
     @DeleteMapping("{id}/delete")
@@ -323,11 +317,11 @@ public class ExamRestController {
             User teacher = userDetails.getUser();
 
             if (teacher.hasRole("Sinh viên")) {
-                return new OkResponse<>("Người dùng không có quyền xoá ca thi").response();
+                return new OkResponse<>(Message.CATHI_DELETE_PERMISSION).response();
             }
 
             Exam exam = examService.findById(id);
-            String message = "Không thể xóa ca thi";
+            String message = Message.CATHI_DELETE_FALSE;
 
             if (!teacher.hasRole("Quản trị viên")) { // Giảng viên
                 // Chưa thi + chưa duyệt

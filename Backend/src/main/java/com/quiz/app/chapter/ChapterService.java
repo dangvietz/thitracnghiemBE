@@ -1,5 +1,6 @@
 package com.quiz.app.chapter;
 
+import com.quiz.app.Message;
 import com.quiz.app.exception.ConstrainstViolationException;
 import com.quiz.app.exception.NotFoundException;
 import com.quiz.entity.Chapter;
@@ -51,9 +52,9 @@ public class ChapterService {
     public String deleteById(Integer id) throws ConstrainstViolationException {
         try {
             chapterRepository.deleteById(id);
-            return "Xóa chương thành công";
+            return Message.DELETE_CHAPTER_SUCCESSFULLY;
         } catch (Exception ex) {
-            throw new ConstrainstViolationException("Không thể xóa chương vì ràng buộc dữ liệu");
+            throw new ConstrainstViolationException(Message.DELETE_CHAPTER_CONSTRAINT);
         }
     }
 
@@ -73,7 +74,7 @@ public class ChapterService {
             return chapter.get();
         }
 
-        throw new NotFoundException("Không tìm thấy môn học với mã " + id);
+        throw new NotFoundException(Message.SUBJECT_ID_NOTFOUND + id);
     }
 
     public Chapter findByName(String name) throws NotFoundException {
@@ -83,7 +84,7 @@ public class ChapterService {
             return chapter;
         }
 
-        throw new NotFoundException("Không tìm thấy môn học với tên " + name);
+        throw new NotFoundException(Message.SUBJECT_NAMENOTFOUND + name);
     }
 
     public boolean isNameDuplicated(Integer id, String name, boolean isEdit) {

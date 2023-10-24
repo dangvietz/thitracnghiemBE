@@ -1,5 +1,6 @@
 package com.quiz.app.creditClass;
 
+import com.quiz.app.Message;
 import com.quiz.app.exception.ConstrainstViolationException;
 import com.quiz.app.exception.NotFoundException;
 import com.quiz.entity.CreditClass;
@@ -47,9 +48,9 @@ public class CreditClassService {
     public String deleteById(Integer id) throws ConstrainstViolationException {
         try {
             creditClassRepository.deleteById(id);
-            return "Xóa lớp tín chỉ thành công";
+            return Message.DELETE_CREDITCLASS_SUCCESSFULLY;
         } catch (Exception ex) {
-            throw new ConstrainstViolationException("Không thể xóa lớp tín chỉ vì ràng buộc dữ liệu");
+            throw new ConstrainstViolationException(Message.DELETE_CREDITCLASS_CONSTRAINT);
         }
     }
 
@@ -59,7 +60,7 @@ public class CreditClassService {
             return cls.get();
         }
 
-        throw new NotFoundException("Không tìm thấy lớp học với mã " + id);
+        throw new NotFoundException(Message.CLASS_ID_NOTFOUND + id);
     }
 
     public List<CreditClass> findAll() {
@@ -86,7 +87,7 @@ public class CreditClassService {
                 group);
 
         if (Objects.isNull(creditClass)) {
-            throw new NotFoundException("Không tìm thấy lớp tín chỉ này");
+            throw new NotFoundException(Message.ERROR_CREDITCLASS_ID_NOTFOUND);
         }
 
         return creditClass;
@@ -169,10 +170,10 @@ public class CreditClassService {
             String responseMessage = "";
             if (action.equals("enable")) {
                 creditClass.setStatus(false);
-                responseMessage = "Mở lớp tín chỉ thành công";
+                responseMessage = Message.ENABLE_CREDITCLASS_SUCCESSFULLY;
             } else {
                 creditClass.setStatus(true);
-                responseMessage = "Hủy lớp tín chỉ thành công";
+                responseMessage = Message.DISABLE_CREDITCLASS_SUCCESSFULLY;
             }
 
             creditClassRepository.save(creditClass);

@@ -1,5 +1,6 @@
 package com.quiz.app.test;
 
+import com.quiz.app.Message;
 import com.quiz.app.exam.ExamService;
 import com.quiz.app.exception.ConstrainstViolationException;
 import com.quiz.app.exception.NotFoundException;
@@ -134,19 +135,19 @@ public class TestRestController {
                                         List<Question> questions
     ) {
         if (isEdit && Objects.isNull(id)) {
-            commonUtils.addError("id", "Mã đề thi không được để trống");
+            commonUtils.addError("id", Message.ERROR_TESTID_NULL);
         }
 
         if (Objects.isNull(name) || StringUtils.isEmpty(name)) {
-            commonUtils.addError("name", "Tên đề thi không được để trống");
+            commonUtils.addError("name", Message.ERROR_TESTNAME_NULL);
         }
 
         if (Objects.isNull(subjectId) || StringUtils.isEmpty(subjectId)) {
-            commonUtils.addError("subjectId", "Môn học không được để trống");
+            commonUtils.addError("subjectId", Message.ERROR_SUBJECT_ID_NULL);
         }
 
         if (questions.size() == 0) {
-            commonUtils.addError("questions", "Danh sách câu hỏi không được để trống");
+            commonUtils.addError("questions", Message.ERROR_QUESTIONLIST_NULL);
         }
     }
 
@@ -171,7 +172,7 @@ public class TestRestController {
             return new BadResponse<String>(commonUtils.getArrayNode().toString()).response();
         } else {
             if (testService.isNameDuplicated(id, name, isEdit)) {
-                commonUtils.addError("name", "Tên đề thi đã tồn tại");
+                commonUtils.addError("name", Message.ERROR_TESTNAME_DUPLICATED);
             }
 
             try {
@@ -232,7 +233,7 @@ public class TestRestController {
             testService.save(Test.build(name, questions, subject, teacher));
         }
 
-        return new OkResponse<>("Thêm đề thi thành công").response();
+        return new OkResponse<>(Message.DETHI_ADD_SUCCESSFULLY).response();
     }
 
     @GetMapping("{id}")

@@ -1,5 +1,6 @@
 package com.quiz.app.question;
 
+import com.quiz.app.Message;
 import com.quiz.app.answer.AnswerService;
 import com.quiz.app.answer.dto.AnswerDTO;
 import com.quiz.app.chapter.ChapterService;
@@ -143,26 +144,26 @@ public class QuestionRestController {
                                             Integer chapterId
     ) {
         if (Objects.isNull(content) || StringUtils.isEmpty(content)) {
-            commonUtils.addError("content", "Nội dung câu hỏi không được để trống");
+            commonUtils.addError("content", Message.ERROR_QUESTION_CONTENT_MISMATCH);
         }
 
         if (Objects.isNull(type) || StringUtils.isEmpty(type)) {
-            commonUtils.addError("content", "Loại câu hỏi không được để trống");
+            commonUtils.addError("content", Message.ERROR_QUESTIONTYPE_CONTENT_MISMATCH);
         }
 
         if (Objects.isNull(level) || StringUtils.isEmpty(level)) {
-            commonUtils.addError("level", "Mức độ không được để trống");
+            commonUtils.addError("level", Message.ERROR_QUESTION_LEVEL_MISMATCH);
         }
 
         for (AnswerDTO ans : answers) {
             if (Objects.isNull(ans.getContent()) || StringUtils.isEmpty(ans.getContent())) {
-                commonUtils.addError("answers", "Không được để trống sự lựa chọn");
+                commonUtils.addError("answers", Message.ERROR_ANSWER_NULL);
                 break;
             }
         }
 
         if (Objects.isNull(chapterId)) {
-            commonUtils.addError("chapterId", "Chương không được để trống");
+            commonUtils.addError("chapterId", Message.ERROR_CHAPTER_NULL);
         }
     }
 
@@ -326,7 +327,7 @@ public class QuestionRestController {
             ProcessImage.uploadImage(devUploadDir, prodUploadDir, staticPath, postCreateQuestionDTO.getImage(), environment);
         }
 
-        return new OkResponse<>("Thêm hoặc sửa câu hỏi thành công").response();
+        return new OkResponse<>(Message.QUESTION_EDIT_SUCCESSFULLY).response();
     }
 
     @Transactional
@@ -403,13 +404,13 @@ public class QuestionRestController {
 
             String responseMessage = "";
             if (i == 0) {
-                responseMessage = "Tất cả câu hỏi đã được thêm từ trước";
+                responseMessage = Message.ERROR_QUESTION_DUPLICATED;
             } else {
-                responseMessage = String.format("%d/%d câu hỏi đã được thêm vào thành công", i, totalQuestions);
+                responseMessage = String.format(Message.QUESTION_ADDED, i, totalQuestions);
             }
             return new OkResponse<>(responseMessage).response();
         } catch (IllegalStateException e) {
-            return new BadResponse<String>("Không thể đọc được nội dung từ file Excel").response();
+            return new BadResponse<String>(Message.ERROR_EXCEL_READ_ERROR).response();
         }
     }
 

@@ -1,5 +1,5 @@
 package com.quiz.app.auth;
-import com.quiz.app.Error_Message;
+import com.quiz.app.Message;
 import com.quiz.app.email.SendEmail;
 import com.quiz.app.exception.NotFoundException;
 import com.quiz.app.jwt.JwtUtils;
@@ -28,7 +28,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,7 +35,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
-import javax.validation.constraints.Null;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -87,20 +85,20 @@ public class AuthRestController {
             User user = userService.findById(loginDTO.getId());
 
             if (!user.isStatus()) {
-                return new ForbiddenResponse<User>("Tài khoản đang bị vô hiệu hóa").response();
+                return new ForbiddenResponse<User>(Message.ERROR_ACCOUNT_DISABLED).response();
             }
 
             user.setToken(token);
 
             return new OkResponse<>(user).response();
         } catch (BadCredentialsException | NotFoundException e) {
-            return new BadResponse<User>(Error_Message.ERROR_USER_MISMATCH).response();
+            return new BadResponse<User>(Message.ERROR_USER_MISMATCH).response();
         }
     }
 
     @GetMapping("logout")
     public ResponseEntity<StandardJSONResponse<String>> logout() {
-        return new OkResponse<>("Đăng xuất thành công").response();
+        return new OkResponse<>(Message.LOGOUT_SUCCESSFULLY).response();
     }
 
     public void catchUserInputException(CommonUtils commonUtils, String id,
@@ -114,47 +112,47 @@ public class AuthRestController {
                                         boolean isEdit
     ) {
         if (Objects.isNull(id) || StringUtils.isEmpty(id)) {
-            commonUtils.addError("id", Error_Message.ERROR_USERID_MISMATCH);
+            commonUtils.addError("id", Message.ERROR_USERID_MISMATCH);
         } else if (id.length() > 10) {
-            commonUtils.addError("id", Error_Message.ERROR_USERID_LENGTH_LIMITED);
+            commonUtils.addError("id", Message.ERROR_USERID_LENGTH_LIMITED);
         }
 
         if (Objects.isNull(firstName) || StringUtils.isEmpty(firstName)) {
-            commonUtils.addError("firstName", "Tên không được để trống");
+            commonUtils.addError("firstName", Message.ERROR_NAME_MISMATCH);
         }
 
         if (Objects.isNull(lastName) || StringUtils.isEmpty(lastName)) {
-            commonUtils.addError("lastName", "Họ không được để trống");
+            commonUtils.addError("lastName", Message.ERROR_FNAME_MISMATCH);
         }
 
         Pattern pattern = Pattern.compile("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}");
         if (Objects.isNull(email) || StringUtils.isEmpty(email)) {
-            commonUtils.addError("email", "Email không được để trống");
+            commonUtils.addError("email", Message.ERROR_EMAIL_MISMATCH);
         } else {
             Matcher matcher = pattern.matcher(email);
             if (!matcher.matches()) {
-                commonUtils.addError("email", "Địa chỉ email không hợp lệ");
+                commonUtils.addError("email", Message.ERROR_INVALID_EMAIL);
             }
         }
 
         if (!isEdit) {
             if (Objects.isNull(password)) {
-                commonUtils.addError("password", "Mật khẩu không được để trống");
+                commonUtils.addError("password", Message.ERROR_PASSWORD_IS_BLANK);
             } else if (password.length() < 8) {
-                commonUtils.addError("password", "Mật khẩu ít nhất 8 ký tự");
+                commonUtils.addError("password", Message.ERROR_PASSWORD_SMALLER_THAN8);
             }
         }
 
         if (Objects.isNull(birthday) || StringUtils.isEmpty(birthday)) {
-            commonUtils.addError("birthday", "Ngày sinh không được để trống");
+            commonUtils.addError("birthday", Message.ERROR_DOB_MISMATCH);
         }
 
         if (Objects.isNull(sexStr) || StringUtils.isEmpty(sexStr)) {
-            commonUtils.addError("sexStr", Error_Message.ERROR_GENDER_MISMATCH);
+            commonUtils.addError("sexStr", Message.ERROR_GENDER_MISMATCH);
         }
 
         if (roles.size() == 0) {
-            commonUtils.addError("sexStr", Error_Message.ERROR_ROLE_MISMATCH);
+            commonUtils.addError("sexStr", Message.ERROR_ROLE_MISMATCH);
         }
     }
 
@@ -182,16 +180,16 @@ public class AuthRestController {
         } else {
             if (!isEdit) {
                 if (userService.isIdDuplicated(id)) {
-                    commonUtils.addError("id", "Mã người dùng đã tồn tại");
+                    commonUtils.addError("id", Message.ERROR_USERID_DUPLICATED);
                 }
             }
 
             if (userService.isBirthdayGreaterThanOrEqualTo18(LocalDate.parse(postCreateUserDTO.getBirthday()))) {
-                commonUtils.addError("birthday", "Tuổi phải lớn hơn 18");
+                commonUtils.addError("birthday", Message.ERROR_DOB_SMALLER_THAN18);
             }
 
             if (userService.isEmailDuplicated(id, email, isEdit)) {
-                commonUtils.addError("email", "Địa chỉ email đã tồn tại");
+                commonUtils.addError("email", Message.ERROR_EMAIL_DUPLICATED);
             }
             if (commonUtils.getArrayNode().size() > 0) {
                 return new BadResponse<String>(commonUtils.getArrayNode().toString()).response();
@@ -205,13 +203,10 @@ public class AuthRestController {
                 user.setLastName(lastName);
                 user.setEmail(email);
                 if (!StringUtils.isEmpty(password)) {
+
                     user.setPassword(password);
                     userService.encodePassword(user);
-                    try {
-                        SendEmail.send("n18dccn243@student.ptithcm.edu.vn", "Đổi mật khẩu",
-                                "Mật khẩu mới cuả bạn là: " + password);
-                    } catch (MessagingException e) {
-                    }
+
                 }
                 if (avatar != null) {
                     user.setAvatar(avatar.getOriginalFilename());
@@ -287,14 +282,15 @@ public class AuthRestController {
         String responseMessage = "";
 
         if (isEdit) {
-            responseMessage = "Cập nhật thông tin người dùng thành công";
+            responseMessage = Message.USER_INFO_UPDATE_SUCCESSFULLY;
         } else if (!needVerifyUser) {
-            responseMessage = "Thêm người dùng thành công";
+            responseMessage = Message.USER_ADD_SUCCESSFULLY;
         } else {
-            responseMessage = "Đăng ký thành công";
+            responseMessage = Message.USER_REGISTER_SUCCESSFULLY;
         }
 
         return new OkResponse<>(responseMessage).response();
+
     }
 
     @PostMapping("forgot-password")
@@ -320,7 +316,7 @@ public class AuthRestController {
                     + resetPasswordCode;
 
             SendEmail.send(user.getEmail(), "Reset your password - QuizApp", msg);
-            String message = "Your reset password link has been sent to your email: " + user.getEmail();
+            String message = Message.EMAIL_SEND_SUCCESSFULLY + user.getEmail();
             ForgotPasswordResponse forgotPasswordResponse = new ForgotPasswordResponse(resetPasswordCode, message,
                     email);
 
@@ -337,7 +333,7 @@ public class AuthRestController {
             @RequestParam(name = "code") int resetPasswordCode,
             @RequestBody ResetPasswordDTO resetPassword) {
         if (resetPassword.getEmail().isEmpty()) {
-            return new BadResponse<String>("Email is required to reset the password. Discard reset password session.")
+            return new BadResponse<String>(Message.ERROR_EMAIL_ISBLANK)
                     .response();
         }
         String newPassword = resetPassword.getNewPassword();
@@ -349,30 +345,33 @@ public class AuthRestController {
 
             // Check if the user's reset password code is null
             if (user.getResetPasswordCode() == null) {
-                return new BadResponse<String>("Reset code is not set. Please request a new password reset link.")
+                return new BadResponse<String>(Message.ERROR_TOKENCODE_EXPIRED)
                         .response();
             }
 
             if (resetPasswordCode != user.getResetPasswordCode())
-                return new BadResponse<String>("Invalid reset code").response();
+                return new BadResponse<String>(Message.ERROR_TOKEN_INVALID).response();
 
             boolean isAfter = now.isAfter(user.getResetPasswordExpirationTime());
             if (isAfter)
-                return new BadResponse<String>("Reset password session is out of time").response();
+                return new BadResponse<String>(Message.ERROR_TIME_EXPIRED).response();
 
             if (newPassword.length() < 8) {
-                return new BadResponse<String>("Password must be at least 8 characters.").response();
+                return new BadResponse<String>(Message.ERROR_PASSWORD_SMALLER_THAN8).response();
+            }
+            if (newPassword.length() > 32) {
+                return new BadResponse<String>(Message.ERROR_PASSWORD_MAX32).response();
             }
 
             if (!newPassword.equals(confirmNewPassword))
-                return new BadResponse<String>("New password does not match confirm new password").response();
+                return new BadResponse<String>(Message.ERROR_PASSWORD_NOTMATCH).response();
 
             user.setPassword(userService.getEncodedPassword(newPassword));
             user.setResetPasswordExpirationTime(null);
             user.setResetPasswordCode(null);
             userService.save(user);
 
-            return new OkResponse<>("Your password has been changed successfully").response();
+            return new OkResponse<>(Message.PASSWORD_RESET_SUCCESSFULLY).response();
         } catch (NotFoundException e) {
             e.printStackTrace();
             return new BadResponse<String>(e.getMessage()).response();

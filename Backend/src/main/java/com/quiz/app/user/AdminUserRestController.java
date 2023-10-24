@@ -1,5 +1,6 @@
 package com.quiz.app.user;
 
+import com.quiz.app.Message;
 import com.quiz.app.exception.NotFoundException;
 import com.quiz.app.exception.VerifiedUserException;
 import com.quiz.app.response.StandardJSONResponse;
@@ -132,7 +133,7 @@ public class AdminUserRestController {
                 }
             }
         }
-        return new OkResponse<>(String.format("%d/%d người dùng được thêm thành công", i, totalRecords)).response();
+        return new OkResponse<>(String.format(Message.ADMIN_USER_ADD_SUCCESSFULLY, i, totalRecords)).response();
     }
 
     @GetMapping("{id}")
@@ -164,10 +165,8 @@ public class AdminUserRestController {
             user.setStatus(action.equals("enable"));
             userService.save(user);
 
-            return new OkResponse<>(action.equals("enable") ? "Kích hoạt người dùng thành công" :
-                    "H" +
-                            "ủy " +
-                            "kích hoạt người dùng thành công").response();
+            return new OkResponse<>(action.equals("enable") ? Message.ENABLE_USER_SUCCESSFULLY :
+                    Message.DISABLE_USER_SUCCESSFULLY).response();
         } catch (NotFoundException e) {
             return new BadResponse<String>(e.getMessage()).response();
         }

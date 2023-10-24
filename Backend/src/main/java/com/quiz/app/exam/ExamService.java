@@ -1,5 +1,6 @@
 package com.quiz.app.exam;
 
+import com.quiz.app.Message;
 import com.quiz.app.exam.dto.TakeExamDTO;
 import com.quiz.app.exception.ConstrainstViolationException;
 import com.quiz.app.exception.NotFoundException;
@@ -8,6 +9,7 @@ import com.quiz.entity.Exam;
 import com.quiz.entity.TakeExam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +28,7 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
+import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -62,9 +65,9 @@ public class ExamService {
             examRepository.updateExamOfTest(exam.getId());
             examRepository.deleteExam(exam.getId());
 
-            return "Xóa ca thi thành công";
+            return Message.DELETE_CATHI_SUCCESSFULLY;
         } catch (Exception ex) {
-            throw new ConstrainstViolationException("Không thể xóa ca thi vì ràng buộc dữ liệu");
+            throw new ConstrainstViolationException(Message.DELETE_CATHI_CONSTRAINT);
         }
     }
 
@@ -74,7 +77,7 @@ public class ExamService {
             return subject.get();
         }
 
-        throw new NotFoundException("Không tìm thấy môn học với mã " + id);
+        throw new NotFoundException(Message.SUBJECT_ID_NOTFOUND + id);
     }
 
     public String enableOrDisable(Integer id, String action) throws NotFoundException {
@@ -83,10 +86,10 @@ public class ExamService {
             String responseMessage = "";
             if (action.equals("enable")) {
                 exam.setStatus(false);
-                responseMessage = "Kích họat ca thi thành công";
+                responseMessage = Message.ENABLE_CATHI_SUCCESSFULLY;
             } else {
                 exam.setStatus(true);
-                responseMessage = "Hủy ca thi thành công";
+                responseMessage = Message.DISABLE_CATHI_SUCCESSFULLY;
             }
 
             examRepository.save(exam);
