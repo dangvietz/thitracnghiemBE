@@ -67,6 +67,7 @@ public class Message {
     public static final String CATHI_DELETE_FALSE="Không thể xóa ca thi";
     public static final String ERROR_SCHOOLYEAR_NULL="Niên khóa không được để trống";
     public static final String ERROR_SEMESTER_NULL="Học kỳ không được để trống";
+    public static final String ERROR_EMAIL_NOTFOUND="Không tìm thấy người dùng với email %s";
     public static final String ERROR_SUBJECT_ID_NULL="Môn học không được để trống";
     public static final String ERROR_SUBJECT_GROUP_NULL="Nhóm không được để trống";
     public static final String ERROR_TEACHER_NULL="Giảng viên không được để trống";

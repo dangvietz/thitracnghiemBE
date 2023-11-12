@@ -1,5 +1,6 @@
 package com.quiz.app.user;
 
+import com.quiz.app.Message;
 import com.quiz.app.exception.NotFoundException;
 import com.quiz.app.exception.VerifiedUserException;
 import com.quiz.app.user.dto.CountUserByRole;
@@ -81,7 +82,7 @@ public class UserService {
             return user;
         }
 
-        throw new NotFoundException(String.format("Không tìm thấy người dùng với email %s", email));
+        throw new NotFoundException(String.format(Message.ERROR_EMAIL_NOTFOUND, email));
     }
 
     public boolean isIdDuplicated(String id) {
